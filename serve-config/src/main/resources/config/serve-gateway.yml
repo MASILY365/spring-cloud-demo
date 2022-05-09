@@ -1,0 +1,31 @@
+server:
+  port: 8002
+
+spring:
+  application:
+    name: SERVE-GATEWAY
+  cloud:
+    gateway:
+      routes:
+        - id: ROUTE-BIZ-SYSTEM
+          # 1.有注册中心 lb:// + 服务id 2.无注册中心 lb:// + 目标url
+          uri: lb://BIZ-SYSTEM
+          predicates:
+            - Path=/system/**
+
+        - id: ROUTE-BIZ-TASK
+          uri: lb://BIZ-TASK
+          predicates:
+            - Path=/task/**
+
+# Eureka相关配置
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8001/eureka/
+  instance:
+    lease-renewal-interval-in-seconds: 10      # 心跳时间，即服务续约间隔时间（缺省为30s）
+    lease-expiration-duration-in-seconds: 60  # 发呆时间，即服务续约到期时间（缺省为90s）
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${server.port}}
+
